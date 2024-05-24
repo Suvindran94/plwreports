@@ -32,7 +32,7 @@
             font-weight: bold;
         }
 
-      
+
         table.dataTable thead {
             background-color: #d3d3d3;
         }
@@ -118,17 +118,17 @@
         <div style="padding-left: 20px; padding-right: 20px; margin-top: -10px;">
             <div class="row" style="height: 35px;">
                 <div class="col-6" style="height: 35px;">
-				
+
                 </div>
                 <div class="col-3" style="height: 35px;">
-					
+
                 </div>
                 <div class="col-3 custom-position" style="text-align:right; height: 35px;">
                     <div class="input-group" style="margin-bottom: 0px !important;">
                         <h2 class="h4" style="line-height: 1.65; margin-bottom: 0;">Month:</h2>
-                       
+
                             <input id="datepicker" class="form-control custom-width" style="height: 35px; background-color: white;" readonly>
-                      
+
                     </div>
                 </div>
             </div>
@@ -137,8 +137,9 @@
                     <thead>
                         <tr>
                             <th class="header-group-1" style="text-align: center !important; width: 3%;">DAY</th>
-                            <th class="header-group-1" style="text-align: center !important; width: 4%;">DATE</th>
-                            <th class="header-group-1" style="text-align: center !important; width: 3%;">TOTAL WORKER</th>
+                            <th class="header-group-1" style="text-align: center !important; width: 5%;">DATE</th>
+                            <th class="header-group-1" style="text-align: center !important; width: 2%;">TOTAL WORKER</th>
+                            <th class="header-group-1" style="text-align: center !important; width: 3%;">TOTAL WORKING HOUR</th>
                             <th class="header-group-1" style="text-align: center !important; width: 4%;">TOTAL OT HOUR</th>
                             <th class="header-group-2" style="text-align: center !important; width: 4%;">DAILY TARGET</th>
                             <th class="header-group-2" style="text-align: center !important; width: 3%;">PRODUCTION - OPERATOR SCAN (PACK)</th>
@@ -202,7 +203,7 @@
                 var formattedLastDay = formatDate(lastDateOfMonth);
 
 						$('#datatable colgroup').empty();
-				
+
                 $('#datatable').DataTable({
                     destroy: true,
                     ajax: {
@@ -215,90 +216,98 @@
                     },
                     columns: [{
                             data: 'DAY',
-                            className: 'text-left'
+                            className: 'text-left', width: '3%',
                         },
                         {
                             data: 'DATE',
-                            className: 'text-left'
+                            className: 'text-left', width: '5%',
+                            render: function(data, type, row) {
+                                var dateParts = data.split('-');
+                                return dateParts[2] + '-' + dateParts[1] + '-' + dateParts[0];
+                            }
                         },
                         {
                             data: 'TOTAL WORKER',
-                            className: 'text-right'
+                            className: 'text-right', width: '3%',
+                        },
+                        {
+                            data: 'TOTAL WORKING HOUR',
+                            className: 'text-right', width: '3%',
                         },
                         {
                             data: 'TOTAL OT HOUR',
-                            className: 'text-right'
+                            className: 'text-right', width: '4%',
                         },
                         {
                             data: 'DAILY TARGET',
-                            className: 'text-right',
+                            className: 'text-right', width: '4%',
                             render: function(data, type, row) {
                                 return formatNumberWithCommas(data);
                             }
                         },
                         {
                             data: 'PRODUCTION - OPERATOR SCAN (PACK)',
-                            className: 'text-right',
+                            className: 'text-right', width: '3%',
                             render: function(data, type, row) {
                                 return formatNumberWithCommas(data);
                             }
                         },
                         {
                             data: 'CUMULATIVE PRODUCTION TOTAL (PACK)',
-                            className: 'text-right',
+                            className: 'text-right', width: '3%',
                             render: function(data, type, row) {
                                 return formatNumberWithCommas(data);
                             }
                         },
                         {
                             data: 'ARL',
-                            className: 'text-right',
+                            className: 'text-right', width: '3%',
                             render: function(data, type, row) {
                                 return formatNumberWithCommas(data);
                             }
                         },
                         {
                             data: 'WORKING DAY MANPOWER RATIO',
-                            className: 'text-right'
+                            className: 'text-right', width: '3%',
                         },
                         {
                             data: 'WAREHOUSE - SCAN RECEIVED (PACK)',
-                            className: 'text-right',
+                            className: 'text-right', width: '3%',
                             render: function(data, type, row) {
                                 return formatNumberWithCommas(data);
                             }
                         },
                         {
                             data: 'CUMULATIVE WAREHOUSE RECEIVED (PACK)',
-                            className: 'text-right',
+                            className: 'text-right', width: '3%',
                             render: function(data, type, row) {
                                 return formatNumberWithCommas(data);
                             }
                         },
                         {
                             data: 'WH ARL',
-                            className: 'text-right',
+                            className: 'text-right', width: '4%',
                             render: function(data, type, row) {
                                 return formatNumberWithCommas(data);
                             }
                         },
                         {
                             data: 'DO (PACK)',
-                            className: 'text-right',
+                            className: 'text-right', width: '3%',
                             render: function(data, type, row) {
                                 return formatNumberWithCommas(data);
                             }
                         },
                         {
                             data: 'CUMULATIVE PACK DO (PACK)',
-                            className: 'text-right',
+                            className: 'text-right', width: '3%',
                             render: function(data, type, row) {
                                 return formatNumberWithCommas(data);
                             }
                         },
                         {
                             data: 'DO ARL',
-                            className: 'text-right',
+                            className: 'text-right', width: '4%',
                             render: function(data, type, row) {
                                 return formatNumberWithCommas(data);
                             }
@@ -311,7 +320,7 @@
                     order: [],
                     columnDefs: [{
                         orderable: false,
-                        targets: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
+                        targets: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
                     }],
                     createdRow: function(row, data, dataIndex) {
                         if (dataIndex === -1) return;
@@ -326,9 +335,9 @@
                         if (data['DAY'] === 'Saturday' || data['DAY'] === 'Sunday') {
                             $(row).addClass('weekend-row');
                         } else {
-                            $(row).find('td:nth-child(5), td:nth-child(6), td:nth-child(7), td:nth-child(8), td:nth-child(9)').addClass('tbody-group-1');
-                            $(row).find('td:nth-child(10), td:nth-child(11), td:nth-child(12)').addClass('tbody-group-2');
-                            $(row).find('td:nth-child(13), td:nth-child(14), td:nth-child(15)').addClass('tbody-group-3');
+                            $(row).find('td:nth-child(6), td:nth-child(7), td:nth-child(8), td:nth-child(9), td:nth-child(10)').addClass('tbody-group-1');
+                            $(row).find('td:nth-child(11), td:nth-child(12), td:nth-child(13)').addClass('tbody-group-2');
+                            $(row).find('td:nth-child(14), td:nth-child(15), td:nth-child(16)').addClass('tbody-group-3');
                         }
                     }
                 });
