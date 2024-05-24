@@ -83,13 +83,7 @@
             </li>
 		
 			  
-			       <li class="menu-item">
-              <a href="/" class="menu-link">
-                <i class="menu-icon tf-icons bx bx-box"></i>
-                <div data-i18n="Analytics">Ordering Dashboard</div>
-              </a>
-            </li>
-			  
+			   
 			  
 			  
 			  
@@ -101,6 +95,14 @@
                 <div data-i18n="Analytics">Daily Efficiency Tracker</div>
               </a>
             </li>
+
+            <li class="menu-item">
+              <a href="/" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-box"></i>
+                <div data-i18n="Analytics">Ordering Dashboard</div>
+              </a>
+            </li>
+			  
 
           
           </ul>

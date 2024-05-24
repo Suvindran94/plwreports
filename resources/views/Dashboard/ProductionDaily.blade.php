@@ -254,7 +254,6 @@
 				
 				var currhr = "{{ $currentHour }}";
 				
-				console.log(currhr);
 				
 		
 				
@@ -296,7 +295,7 @@ var selecteddate = new Date(selecteddateString);
 
 var todaysdate = new Date();
 var todaysdateFormatted = ('0' + todaysdate.getDate()).slice(-2) + '/' + ('0' + (todaysdate.getMonth() + 1)).slice(-2) + '/' + todaysdate.getFullYear();
-console.log(selecteddateString, todaysdateFormatted);
+
 
 var highlightClass = currentHour === "{{ $currentHour }}" && selecteddateString === todaysdateFormatted ? 'highlight' : '';
 
@@ -312,7 +311,7 @@ var selecteddate = new Date(selecteddateString);
 
 var todaysdate = new Date();
 var todaysdateFormatted = ('0' + todaysdate.getDate()).slice(-2) + '/' + ('0' + (todaysdate.getMonth() + 1)).slice(-2) + '/' + todaysdate.getFullYear();
-console.log(selecteddateString, todaysdateFormatted);
+
 
                         if (currentHour === "{{ $currentHour }}" && selecteddateString === todaysdateFormatted) {
                             if (parseFloat(achievement) < 0) {
@@ -332,14 +331,25 @@ console.log(selecteddateString, todaysdateFormatted);
             }
 
             $('#datepicker').datepicker({
-                format: "dd/mm/yyyy",
-                orientation: "bottom",
-                autoclose: true,
-                todayBtn: "linked",
-            }).on('changeDate', function(e) {
-                var selectedDate = e.date;
-                initializeDataTable(selectedDate);
-            });
+    format: "dd/mm/yyyy",
+    orientation: "bottom",
+    autoclose: true,
+    todayBtn: "linked",
+}).on('changeDate', function(e) {
+    var selectedDate = moment(e.date).format('DD/MM/YYYY');
+    updateHeader(selectedDate);
+
+    var selectedDates = e.date;
+                initializeDataTable(selectedDates);
+});
+
+function updateHeader(date) {
+    var formattedDate = moment(date, "DD/MM/YYYY").format('DD/MM/YYYY');
+    var dayOfWeek = moment(date, "DD/MM/YYYY").format('dddd');
+    var headerText = 'HOURLY EFFICIENCY MONITOR ON ' + formattedDate + ' (' + dayOfWeek + ')';
+    $('.fw-bold.py-3.mb-4').text(headerText);
+}
+
 
             var initialDate = new Date();
 			
@@ -351,6 +361,7 @@ console.log(selecteddateString, todaysdateFormatted);
           
         });
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.30.1/moment.min.js"></script>
 </body>
 
 </html>
