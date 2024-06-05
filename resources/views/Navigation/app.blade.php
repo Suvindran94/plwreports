@@ -72,7 +72,7 @@
           <div class="menu-inner-shadow"></div>
 
           <ul class="menu-inner py-1">
-			  
+
             <!-- Dashboard -->
 
 			    <li class="menu-item">
@@ -81,14 +81,14 @@
                 <div data-i18n="Analytics">Hourly Efficiency Monitor Dashboard</div>
               </a>
             </li>
-		
-			  
-			   
-			  
-			  
-			  
-			  
-	
+
+
+
+
+
+
+
+
 			   <li class="menu-item">
               <a href="/dailyEffTrackDash" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-bar-chart-square"></i>
@@ -102,9 +102,9 @@
                 <div data-i18n="Analytics">Ordering Dashboard</div>
               </a>
             </li>
-			  
 
-          
+
+
           </ul>
         </aside>
         <!-- / Menu -->
@@ -114,7 +114,7 @@
 
           <nav
             class="layout-navbar container-xxl navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme"
-            id="layout-navbar"
+            id="layout-navbar" style="position: sticky !important; top: 0;"
           >
             <div class="layout-menu-toggle navbar-nav align-items-xl-center me-3 me-xl-0 d-xl-none">
               <a class="nav-item nav-link px-0 me-xl-4" href="javascript:void(0)">
@@ -128,8 +128,8 @@
 					<i class='bx bx-menu fs-4 lh-0' id="swipeleft"></i>
 				  </div>
               <ul class="navbar-nav flex-row align-items-center ms-auto">
-				  
-				  
+
+
                 <!-- User -->
                 <li class="nav-item navbar-dropdown dropdown-user dropdown">
                   <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown">
@@ -143,7 +143,7 @@
                         <div class="d-flex">
                           <div class="flex-shrink-0 me-3">
                             <div class="avatar avatar-online">
-                                
+
                               <img src="https://ierp.tk/uploads/avatars/{{ Auth::user()->profImage }}" alt class="w-px-40 h-auto rounded-circle" />
                             </div>
                           </div>
@@ -169,7 +169,7 @@
               </ul>
             </div>
           </nav>
-			
-			
+
+
 
           <!-- / Navbar -->
