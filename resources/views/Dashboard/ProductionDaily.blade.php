@@ -245,8 +245,7 @@
 
                 rowCallback: function(row, data) {
                     var currentHour = data['TIME'];
-                    var selecteddateString = $('#datepicker')
-                .val(); // Assuming this is in the format "24/05/2024"
+                    var selecteddateString = $('#datepicker').val(); // Assuming this is in the format "24/05/2024"
                     var selecteddate = new Date(selecteddateString);
 
                     var todaysdate = new Date();
@@ -263,8 +262,7 @@
                 createdRow: function(row, data) {
                     var currentHour = data['TIME'];
                     var achievement = data['ACHIEVEMENT (PACK)'];
-                    var selecteddateString = $('#datepicker')
-                .val(); // Assuming this is in the format "24/05/2024"
+                    var selecteddateString = $('#datepicker').val(); // Assuming this is in the format "24/05/2024"
                     var selecteddate = new Date(selecteddateString);
 
                     var todaysdate = new Date();
@@ -285,8 +283,24 @@
                             });
                         }
                     }
+                },
+                drawCallback: function(settings) {
+                    scrollToHighlight();
                 }
             });
+        }
+
+        function scrollToHighlight() {
+            var container = $('.tableFixHead');
+            var highlight = $('.highlight');
+            var headerHeight = $('.sticky-header').outerHeight(true);
+
+            if (highlight.length) {
+                var scrollTop = highlight.offset().top - container.offset().top + container.scrollTop() - headerHeight;
+                container.animate({
+                    scrollTop: scrollTop
+                }, 500);
+            }
         }
 
         $('#datepicker').datepicker({
