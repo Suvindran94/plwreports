@@ -86,38 +86,35 @@
 
     .sticky-header {
         position: sticky !important;
-        top: 80;
-        z-index: 10;
+        top: 60 !important;
+        background: #f5f5f9;
+        z-index: 11 !important;
+        height: 60px;
     }
 
     .sticky-date {
-        position: sticky !important;
-        top: 160;
-        z-index: 10;
+        position: sticky!important;
+        top: 120;
+        background: #f5f5f9;
+        z-index: 11;
     }
 
-    .tableFixHead {
-        overflow: auto;
-        height: 69vh;
-    }
-
-    .tableFixHead thead th {
-        position: sticky;
-        top: -2;
+    table.dataTable thead {
+        position: sticky!important;
+        top: 150;
         z-index: 5;
-        background-color: #d3d3d3;
     }
 </style>
 
 <!-- Content wrapper -->
-<div class="content-wrapper" style="position: sticky !important; top: 0; z-index: 20;">
+<div class="content-wrapper">
     <!-- Content -->
     <div class="container-xxl flex-grow-1 container-p-y">
         <h4 class="fw-bold py-3 mb-4 sticky-header">HOURLY EFFICIENCY MONITOR ON {{ Carbon\Carbon::now()->format('d/m/Y') }}
             ({{ Carbon\Carbon::now()->format('l') }})</h4>
 
-        <div style="padding-left: 20px; padding-right: 20px;">
-            <div class="row sticky-date" style="height: 35px;">
+        <div class="sticky-date" style="padding-left: 20px; padding-right: 20px;">
+            <div class="row" style="height: 35px;">
                 <div class="col-6" style="height: 35px;">
                 </div>
                 <div class="col-3" style="height: 35px;">
@@ -133,7 +130,7 @@
                 </div>
             </div>
         </div>
-        <div class="tableFixHead">
+        <div>
             <table id="datatable" class="table table-striped table-bordered" style="width:100%;">
                 <thead>
                     <tr>
@@ -285,20 +282,18 @@
                     }
                 },
                 drawCallback: function(settings) {
-                    scrollToHighlight();
+                    scrollToHighlightedRow();
                 }
             });
         }
 
-        function scrollToHighlight() {
-            var container = $('.tableFixHead');
-            var highlight = $('.highlight');
-            var headerHeight = $('.sticky-header').outerHeight(true);
-
-            if (highlight.length) {
-                var scrollTop = highlight.offset().top - container.offset().top + container.scrollTop() - headerHeight;
-                container.animate({
-                    scrollTop: scrollTop
+        function scrollToHighlightedRow() {
+            var highlightedRow = $('.highlight').first();
+            if (highlightedRow.length > 0) {
+                var container = $('html, body');
+                var topOffset = highlightedRow.offset().top - $('.sticky-header').outerHeight(true) - 200;
+                container.stop().animate({
+                    scrollTop: topOffset
                 }, 500);
             }
         }
