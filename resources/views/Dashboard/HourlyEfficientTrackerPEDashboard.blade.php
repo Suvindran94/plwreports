@@ -93,14 +93,14 @@
     }
 
     .sticky-date {
-        position: sticky!important;
+        position: sticky !important;
         top: 120;
         background: #f5f5f9;
         z-index: 11;
     }
 
     table.dataTable thead {
-        position: sticky!important;
+        position: sticky !important;
         top: 150;
         z-index: 5;
     }
@@ -110,7 +110,8 @@
 <div class="content-wrapper">
     <!-- Content -->
     <div class="container-xxl flex-grow-1 container-p-y">
-        <h4 class="fw-bold py-3 mb-4 sticky-header">HOURLY EFFICIENCY MONITOR (PE) ON {{ Carbon\Carbon::now()->format('d/m/Y') }}
+        <h4 class="fw-bold py-3 mb-4 sticky-header">HOURLY EFFICIENCY MONITOR (PE) ON
+            {{ Carbon\Carbon::now()->format('d/m/Y') }}
             ({{ Carbon\Carbon::now()->format('l') }})</h4>
 
         <div class="sticky-date" style="padding-left: 20px; padding-right: 20px;">
@@ -196,8 +197,6 @@
             $('#date-heading').text(`HOURLY EFFICIENCY MONITOR (PE) ON ${formattedDate} (${formattedDay})`);
 
             $('#datatable').DataTable({
-                // scrollCollapse: true,
-                // scrollY: 600,
                 destroy: true,
                 ajax: {
                     type: 'GET',
@@ -213,31 +212,52 @@
                     },
                     {
                         data: 'HOURLY TARGET (TARGET)',
-                        className: 'text-right'
+                        className: 'text-right',
+                        render: function(data) {
+                            return parseFloat(data).toFixed(3);
+                        }
                     },
                     {
                         data: 'DAILY TARGET (KG)',
-                        className: 'text-right'
+                        className: 'text-right',
+                        render: function(data) {
+                            return parseFloat(data).toFixed(3);
+                        }
                     },
                     {
                         data: 'HOURLY TOTAL (ACTUAL)',
-                        className: 'text-right'
+                        className: 'text-right',
+                        render: function(data) {
+                            return parseFloat(data).toFixed(3);
+                        }
                     },
                     {
                         data: 'TODAY\'S TOTAL (KG)',
-                        className: 'text-right'
+                        className: 'text-right',
+                        render: function(data) {
+                            return parseFloat(data).toFixed(3);
+                        }
                     },
                     {
                         data: 'ACHIEVEMENT (KG)',
-                        className: 'text-right'
+                        className: 'text-right',
+                        render: function(data) {
+                            return parseFloat(data).toFixed(3);
+                        }
                     },
                     {
                         data: 'WASTE (KG)',
-                        className: 'text-right'
+                        className: 'text-right',
+                        render: function(data) {
+                            return parseFloat(data).toFixed(3);
+                        }
                     },
                     {
                         data: 'TODAY\'S WASTE (KG)',
-                        className: 'text-right'
+                        className: 'text-right',
+                        render: function(data) {
+                            return parseFloat(data).toFixed(3);
+                        }
                     }
                 ],
                 paging: false,
