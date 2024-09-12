@@ -110,7 +110,7 @@
 <div class="content-wrapper">
     <!-- Content -->
     <div class="container-xxl flex-grow-1 container-p-y">
-        <h4 class="fw-bold py-3 mb-4 sticky-header">HOURLY EFFICIENCY MONITOR (COMPRESSION FITTINGS) ON {{ Carbon\Carbon::now()->format('d/m/Y') }}
+        <h4 class="fw-bold py-3 mb-4 sticky-header">HOURLY EFFICIENCY MONITOR (PE) ON {{ Carbon\Carbon::now()->format('d/m/Y') }}
             ({{ Carbon\Carbon::now()->format('l') }})</h4>
 
         <div class="sticky-date" style="padding-left: 20px; padding-right: 20px;">
@@ -136,10 +136,12 @@
                     <tr>
                         <th style="text-align: center;">TIME</th>
                         <th style="text-align: center;">HOURLY TARGET (TARGET)</th>
-                        <th style="text-align: center;">DAILY TARGET (PACK)</th>
+                        <th style="text-align: center;">DAILY TARGET (KG)</th>
                         <th style="text-align: center;">HOURLY TOTAL (ACTUAL)</th>
-                        <th style="text-align: center;">TODAY'S TOTAL (PACK)</th>
-                        <th style="text-align: center;">ACHIEVEMENT (PACK)</th>
+                        <th style="text-align: center;">TODAY'S TOTAL (KG)</th>
+                        <th style="text-align: center;">ACHIEVEMENT (KG)</th>
+                        <th style="text-align: center;">WASTE (KG)</th>
+                        <th style="text-align: center;">TODAY'S WASTE (KG)</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -191,7 +193,7 @@
 
             $('#datatable colgroup').empty();
 
-            $('#date-heading').text(`HOURLY EFFICIENCY MONITOR (COMPRESSION FITTINGS) ON ${formattedDate} (${formattedDay})`);
+            $('#date-heading').text(`HOURLY EFFICIENCY MONITOR (PE) ON ${formattedDate} (${formattedDay})`);
 
             $('#datatable').DataTable({
                 // scrollCollapse: true,
@@ -199,7 +201,7 @@
                 destroy: true,
                 ajax: {
                     type: 'GET',
-                    url: '/productionDailyReportDashAjax/',
+                    url: '/hourlyEffTrackPEDashAjax/',
                     data: {
                         start_date: formattedFirstDay,
                         end_date: formattedLastDay,
@@ -214,7 +216,7 @@
                         className: 'text-right'
                     },
                     {
-                        data: 'DAILY TARGET (PACK)',
+                        data: 'DAILY TARGET (KG)',
                         className: 'text-right'
                     },
                     {
@@ -222,11 +224,19 @@
                         className: 'text-right'
                     },
                     {
-                        data: 'TODAY\'S TOTAL (PACK)',
+                        data: 'TODAY\'S TOTAL (KG)',
                         className: 'text-right'
                     },
                     {
-                        data: 'ACHIEVEMENT (PACK)',
+                        data: 'ACHIEVEMENT (KG)',
+                        className: 'text-right'
+                    },
+                    {
+                        data: 'WASTE (KG)',
+                        className: 'text-right'
+                    },
+                    {
+                        data: 'TODAY\'S WASTE (KG)',
                         className: 'text-right'
                     }
                 ],
@@ -258,7 +268,7 @@
                 },
                 createdRow: function(row, data) {
                     var currentHour = data['TIME'];
-                    var achievement = data['ACHIEVEMENT (PACK)'];
+                    var achievement = data['ACHIEVEMENT (KG)'];
                     var selecteddateString = $('#datepicker').val(); // Assuming this is in the format "24/05/2024"
                     var selecteddate = new Date(selecteddateString);
 
@@ -314,7 +324,7 @@
         function updateHeader(date) {
             var formattedDate = moment(date, "DD/MM/YYYY").format('DD/MM/YYYY');
             var dayOfWeek = moment(date, "DD/MM/YYYY").format('dddd');
-            var headerText = 'HOURLY EFFICIENCY MONITOR (COMPRESSION FITTINGS) ON ' + formattedDate + ' (' + dayOfWeek + ')';
+            var headerText = 'HOURLY EFFICIENCY MONITOR (PE) ON ' + formattedDate + ' (' + dayOfWeek + ')';
             $('.fw-bold.py-3.mb-4').text(headerText);
         }
 
