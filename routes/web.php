@@ -33,7 +33,8 @@ Route::get('/productionHourlyDashAjax', [DashboardController::class, 'productDas
 Route::get('/productionDailyReportDash', [DashboardController::class, 'productDashDailyReport'])->name('productionDailyReportDash');
 Route::get('/productionDailyReportDashAjax', [DashboardController::class, 'productDashDailyReportAjax'])->name('productionDailyReportDashAjax');
 
-
 Route::get('/dailyEffTrackDash', [DashboardController::class, 'dailyEfficientTrack'])->name('dailyEffTrackDash');
 Route::get('/dailyEffTrackDashAjax', [DashboardController::class, 'dailyEfficientTrackAjax'])->name('dailyEffTrackDashAjax');
 
+Route::get('/hourlyEffTrackPEDash', [DashboardController::class, 'hourlyEfficientTrackPE'])->name('hourlyEffTrackPEDash');
+Route::get('/hourlyEffTrackPEDashAjax', [DashboardController::class, 'hourlyEfficientTrackPEAjax'])->name('hourlyEffTrackPEDashAjax');
