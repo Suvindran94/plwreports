@@ -989,7 +989,7 @@ where TotalSOQty <> (Done_pbag_PRD + Done_pbag_STK)
                             where TEMP_PE_DAILY_REPORT.TrxStkCode = STK_MST.STK_CODE
                             and TEMP_PE_DAILY_REPORT.TrxStatus = 'A'
                             and TEMP_PE_DAILY_REPORT.TrxStkCode = 'R0PE10H1000'
-                            and TEMP_PE_DAILY_REPORT.TrxUsr = '17'
+                            and TEMP_PE_DAILY_REPORT.TrxUsr = '" . auth()->user()->id . "'
                             and convert(TEMP_PE_DAILY_REPORT.Trxdate,date) between '" . $startDate . "' and '" . $endDate . "'
 
                             union all
