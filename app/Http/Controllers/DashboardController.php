@@ -950,6 +950,14 @@ where TotalSOQty <> (Done_pbag_PRD + Done_pbag_STK)
 
         $currentHour = Carbon::now()->format('H:00:00');
 
+        // Using startDate as the date
+        DB::statement("delete from ierpadmin.TEMP_PE_DAILY_REPORT
+                    where convert( TrxDate, date ) between '$startDate' AND '$startDate'
+                    and TrxUsr = '" . auth()->user()->id . "'");
+
+        // Using startDate as the date
+        DB::statement("call ierpadmin.SP_GENERATE_DAILY_TARGET_PE('$startDate', '$startDate', '" . auth()->user()->id . "')");
+
         $theData = DB::connection('mysql')
             ->select("
                 select t_time as 'TIME', target as 'HOURLY TARGET (TARGET)',
@@ -971,52 +979,51 @@ where TotalSOQty <> (Done_pbag_PRD + Done_pbag_STK)
                         left join
                         (
                             select SfuDate, ifnull(round(sum(Tbl_b.TotalActualQtyOut),3),0) as SFUKG, ifnull(round(sum(Tbl_b.actualwaste),3),0) as WASTEKG
-                        from
-                        (
-                            select ' ' as rowtype, Date_format(TEMP_PE_DAILY_REPORT.TrxDate, '%Y-%m') as TrxMthYr, TEMP_PE_DAILY_REPORT.TrxStkID as TrxStkID,
-                            TEMP_PE_DAILY_REPORT.TrxStkCode as stkcode,
-                            STK_MST.STK_SHORT_NAME as stknameS, STK_MST.STK_CAT1 as StkCat1,
-                            TEMP_PE_DAILY_REPORT.TrxWH as TrxWH,
-                            TEMP_PE_DAILY_REPORT.TrxQtyDB as TotalActualQtyIn,
-                            TEMP_PE_DAILY_REPORT.TrxQtyCR as TotalActualQtyOut,
-                            TEMP_PE_DAILY_REPORT.TrxUOM as TrxStkUOM, TEMP_PE_DAILY_REPORT.Trxdate as SfuDate, TEMP_PE_DAILY_REPORT.TrxWH as SfuFgWh,
-                            STK_MST.STK_CAT1 as RawStkCat1, TEMP_PE_DAILY_REPORT.TrxStkCode as RawStockCode, STK_MST.STK_SHORT_NAME as Stock,
-                            TEMP_PE_DAILY_REPORT.TrxUOM as BomRawQtyPerUom,
-                            0 as TotalStandardWaste,
-                            (TEMP_PE_DAILY_REPORT.TrxQtyCR ) as TotalScrapWaste,
-                            0 as actualwaste
-                            from ierpadmin.TEMP_PE_DAILY_REPORT TEMP_PE_DAILY_REPORT, ierpSM.STK_MST STK_MST
-                            where TEMP_PE_DAILY_REPORT.TrxStkCode = STK_MST.STK_CODE
-                            and TEMP_PE_DAILY_REPORT.TrxStatus = 'A'
-                            and TEMP_PE_DAILY_REPORT.TrxStkCode = 'R0PE10H1000'
-                            and TEMP_PE_DAILY_REPORT.TrxUsr = '" . auth()->user()->id . "'
-                            and convert(TEMP_PE_DAILY_REPORT.Trxdate,date) between '" . $startDate . "' and '" . $endDate . "'
+                            from
+                            (
+                                select ' ' as rowtype, Date_format(TEMP_PE_DAILY_REPORT.TrxDate, '%Y-%m') as TrxMthYr, TEMP_PE_DAILY_REPORT.TrxStkID as TrxStkID,
+                                    TEMP_PE_DAILY_REPORT.TrxStkCode as stkcode,
+                                    STK_MST.STK_SHORT_NAME as stknameS, STK_MST.STK_CAT1 as StkCat1,
+                                    TEMP_PE_DAILY_REPORT.TrxWH as TrxWH,
+                                    TEMP_PE_DAILY_REPORT.TrxQtyDB as TotalActualQtyIn,
+                                    TEMP_PE_DAILY_REPORT.TrxQtyCR as TotalActualQtyOut,
+                                    TEMP_PE_DAILY_REPORT.TrxUOM as TrxStkUOM, TEMP_PE_DAILY_REPORT.Trxdate as SfuDate, TEMP_PE_DAILY_REPORT.TrxWH as SfuFgWh,
+                                    STK_MST.STK_CAT1 as RawStkCat1, TEMP_PE_DAILY_REPORT.TrxStkCode as RawStockCode, STK_MST.STK_SHORT_NAME as Stock,
+                                    TEMP_PE_DAILY_REPORT.TrxUOM as BomRawQtyPerUom,
+                                    0 as TotalStandardWaste,
+                                    (TEMP_PE_DAILY_REPORT.TrxQtyCR ) as TotalScrapWaste,
+                                    0 as actualwaste
+                                    from ierpadmin.TEMP_PE_DAILY_REPORT TEMP_PE_DAILY_REPORT, ierpSM.STK_MST STK_MST
+                                    where TEMP_PE_DAILY_REPORT.TrxStkCode = STK_MST.STK_CODE
+                                    and TEMP_PE_DAILY_REPORT.TrxStatus = 'A'
+                                    and TEMP_PE_DAILY_REPORT.TrxStkCode = 'R0PE10H1000'
+                                    and TEMP_PE_DAILY_REPORT.TrxUsr = '" . auth()->user()->id . "'
+                                    and convert(TEMP_PE_DAILY_REPORT.Trxdate,date) between '" . $startDate . "' and '" . $endDate . "'
 
-                            union all
+                                union all
 
-                            select ' ' as rowtype, Date_format(STK_LEDGER_ALL.TrxDate, '%Y-%m') as TrxMthYr, STK_LEDGER_ALL.TrxStkID as TrxStkID,
-                            STK_LEDGER_ALL.TrxStkCode as stkcode,
-                            STK_MST.STK_SHORT_NAME as stknameS, STK_MST.STK_CAT1 as StkCat1,
-                            STK_LEDGER_ALL.TrxWH as TrxWH,
-                            0 as TotalActualQtyIn,
-                            0 as TotalActualQtyOut,
-                            STK_LEDGER_ALL.TrxUOM as TrxStkUOM, STK_LEDGER_ALL.Trxdate as SfuDate, STK_LEDGER_ALL.TrxWH as SfuFgWh,
-                            STK_MST.STK_CAT1 as RawStkCat1, STK_LEDGER_ALL.TrxStkCode as RawStockCode, STK_MST.STK_SHORT_NAME as Stock,
-                            STK_LEDGER_ALL.TrxUOM as BomRawQtyPerUom,
-                            0 as TotalStandardWaste,
-                            (STK_LEDGER_ALL.TrxQtyCR ) as TotalScrapWaste,
-                            ((STK_LEDGER_ALL.TrxQtyCR ) + 0 ) as actualwaste
-                            from ierpSM.STK_LEDGER_ALL STK_LEDGER_ALL, ierpSM.STK_MST STK_MST
-                            where STK_LEDGER_ALL.TrxStkCode = STK_MST.STK_CODE
-                            and STK_LEDGER_ALL.TrxType in ('QLC-BUYOFF','QLC-LAB','QLC-SCRAP','SFU-LAB' ,'SFU-BUYOFF', 'SFU-SCRAP')
-                            and substring(STK_MST.STK_CAT1,1,1) in ('R', 'S')
-                            and STK_LEDGER_ALL.TrxWH in ('1WHP', '1WHO', '1WHH')
-                            and STK_LEDGER_ALL.TrxStatus = 'A'
-                            and STK_LEDGER_ALL.TrxStkCode = 'R0PE10H1000'
-                            and convert(STK_LEDGER_ALL.Trxdate,date) between '" . $startDate . "' and '" . $endDate . "'
-
-                        ) Tbl_b
-                        group by SfuDate
+                                select ' ' as rowtype, Date_format(STK_LEDGER_ALL.TrxDate, '%Y-%m') as TrxMthYr, STK_LEDGER_ALL.TrxStkID as TrxStkID,
+                                    STK_LEDGER_ALL.TrxStkCode as stkcode,
+                                    STK_MST.STK_SHORT_NAME as stknameS, STK_MST.STK_CAT1 as StkCat1,
+                                    STK_LEDGER_ALL.TrxWH as TrxWH,
+                                    0 as TotalActualQtyIn,
+                                    0 as TotalActualQtyOut,
+                                    STK_LEDGER_ALL.TrxUOM as TrxStkUOM, STK_LEDGER_ALL.Trxdate as SfuDate, STK_LEDGER_ALL.TrxWH as SfuFgWh,
+                                    STK_MST.STK_CAT1 as RawStkCat1, STK_LEDGER_ALL.TrxStkCode as RawStockCode, STK_MST.STK_SHORT_NAME as Stock,
+                                    STK_LEDGER_ALL.TrxUOM as BomRawQtyPerUom,
+                                    0 as TotalStandardWaste,
+                                    (STK_LEDGER_ALL.TrxQtyCR ) as TotalScrapWaste,
+                                    ((STK_LEDGER_ALL.TrxQtyCR ) + 0 ) as actualwaste
+                                    from ierpSM.STK_LEDGER_ALL STK_LEDGER_ALL, ierpSM.STK_MST STK_MST
+                                    where STK_LEDGER_ALL.TrxStkCode = STK_MST.STK_CODE
+                                    and STK_LEDGER_ALL.TrxType in ('QLC-BUYOFF','QLC-LAB','QLC-SCRAP','SFU-LAB' ,'SFU-BUYOFF', 'SFU-SCRAP')
+                                    and substring(STK_MST.STK_CAT1,1,1) in ('R', 'S')
+                                    and STK_LEDGER_ALL.TrxWH in ('1WHP', '1WHO', '1WHH')
+                                    and STK_LEDGER_ALL.TrxStatus = 'A'
+                                    and STK_LEDGER_ALL.TrxStkCode = 'R0PE10H1000'
+                                    and convert(STK_LEDGER_ALL.Trxdate,date) between '" . $startDate . "' and '" . $endDate . "'
+                            ) Tbl_b
+                            group by SfuDate
                         ) c on hour(c.SfuDate) = hour(numbers.num)
                         group by numbers.num, numbers.target
                     ) TempA
