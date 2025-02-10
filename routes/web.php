@@ -38,3 +38,5 @@ Route::get('/dailyEffTrackDashAjax', [DashboardController::class, 'dailyEfficien
 
 Route::get('/hourlyEffTrackPEDash', [DashboardController::class, 'hourlyEfficientTrackPE'])->name('hourlyEffTrackPEDash');
 Route::get('/hourlyEffTrackPEDashAjax', [DashboardController::class, 'hourlyEfficientTrackPEAjax'])->name('hourlyEffTrackPEDashAjax');
+
+Route::get('/gethourlyEfficientCEDetails', [DashboardController::class, 'hourlyEfficientCEDetails'])->name('gethourlyEfficientCEDetails');

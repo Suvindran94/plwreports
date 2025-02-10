@@ -779,6 +779,7 @@ where TotalSOQty <> (Done_pbag_PRD + Done_pbag_STK)
                     left join
                     (
                     select  qrmaster.dt_opscancomplete, count(qrcode) from ierpadmin.qrmaster where convert( qrmaster.dt_opscancomplete,date) between '" . $startDate . "' and '" . $endDate . "'
+                    and stockcode like '1%'
                     group by  qrmaster.dt_opscancomplete
                     ) c on hour(c.dt_opscancomplete) = hour(numbers.num)
                     group by numbers.num, numbers.target
@@ -1032,6 +1033,45 @@ where TotalSOQty <> (Done_pbag_PRD + Done_pbag_STK)
                     JOIN (SELECT @running_waste:=0) p
                 ) TempZ;
             ");
+
+        return response()->json(['data' => $theData, 'currentHour' => $currentHour]);
+    }
+
+    public function hourlyEfficientCEDetails(Request $request)
+    {
+        $time = $request->query('time', '20:00:00');
+
+        $startDate = $request->start_date;
+        $endDate = $request->end_date;
+
+        $currentHour = Carbon::now()->format('H:00:00');
+
+        $theData = DB::connection('mysql')
+        ->select("
+            select '2025-02-07' as 'DATE', t_time as 'TIME', sonum as 'SO#',
+                stockcode as 'STOCKCODE', cnt_prd as 'HOURLY TOTAL (ACTUAL)'
+            from
+            (
+                select target, numbers.num as t_time, sonum, stockcode, count(c.dt_opscancomplete) cnt_prd
+                from
+                    (
+                        select T_HOUR as num, T_HRS_TARGET as target
+                        from ierpadmin.TARGET_PRD_HOURLY
+                        where T_DAYNAME = DAYNAME(STR_TO_DATE('" . $endDate . "', '%Y-%m-%d'))
+                    ) numbers
+                    left join
+                    (
+                        select sonum, stockcode, qrmaster.dt_opscancomplete, count(qrcode)
+                        from ierpadmin.qrmaster
+                        where convert( qrmaster.dt_opscancomplete,date) between '" . $startDate . "' and '" . $endDate . "'
+                        and stockcode like '1%'
+                        group by sonum, stockcode, qrmaster.dt_opscancomplete
+                    ) c on hour(c.dt_opscancomplete) = hour(numbers.num)
+                group by sonum, stockcode, numbers.num, numbers.target
+            ) TempA
+            where t_time = ?
+            order by 1,2,3,4
+        ", [$time]);
 
         return response()->json(['data' => $theData, 'currentHour' => $currentHour]);
     }

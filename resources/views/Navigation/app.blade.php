@@ -65,25 +65,25 @@
 
                 <ul class="menu-inner py-1">
                     <!-- Dashboard -->
-                    <li class="menu-item">
+                    <li class="menu-item {{ Request::is('productionDailyReportDash') ? 'active' : '' }}">
                         <a href="/productionDailyReportDash" class="menu-link">
                             <i class="menu-icon tf-icons bx bx-tachometer"></i>
                             <div data-i18n="Analytics">Hourly Efficiency Monitor Dashboard (Compression Fittings)</div>
                         </a>
                     </li>
-                    <li class="menu-item">
+                    <li class="menu-item {{ Request::is('hourlyEffTrackPEDash') ? 'active' : '' }}">
                         <a href="/hourlyEffTrackPEDash" class="menu-link">
                             <i class="menu-icon tf-icons bx bx-notepad"></i>
                             <div data-i18n="Analytics">Hourly Efficiency Monitor Dashboard (PE)</div>
                         </a>
                     </li>
-                    <li class="menu-item">
+                    <li class="menu-item {{ Request::is('dailyEffTrackDash') ? 'active' : '' }}">
                         <a href="/dailyEffTrackDash" class="menu-link">
                             <i class="menu-icon tf-icons bx bx-bar-chart-square"></i>
                             <div data-i18n="Analytics">Daily Efficiency Tracker (Compression Fittings)</div>
                         </a>
                     </li>
-                    <li class="menu-item">
+                    <li class="menu-item {{ Request::is('/') ? 'active' : '' }}">
                         <a href="/" class="menu-link">
                             <i class="menu-icon tf-icons bx bx-box"></i>
                             <div data-i18n="Analytics">Ordering Dashboard</div>
