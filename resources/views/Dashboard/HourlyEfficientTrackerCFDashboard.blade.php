@@ -132,6 +132,10 @@
         cursor: pointer;
     }
 
+    .hourly-total.no-pointer {
+        cursor: auto;
+    }
+
     #hourlyTotalTable.dataTable th {
         text-align: left !important;
     }
@@ -287,8 +291,11 @@
                     },
                     {
                         data: 'HOURLY TOTAL (ACTUAL)',
-                        className: 'text-right clickable-hourly-total',
+                        className: 'text-right',
                         render: function(data, type, row) {
+                            if (data === 0 || data === '0') {
+                                return `<span class="hourly-total no-pointer" data-id="${row.id}" data-value="${data}">${data}</span>`;
+                            }
                             return `<span class="hourly-total" data-id="${row.id}" data-value="${data}">${data}</span>`;
                         }
                     },
@@ -359,6 +366,12 @@
         }
 
         $(document).on('click', '.hourly-total', function() {
+            var dataValue = $(this).data('value');
+
+            if (dataValue === 0 || dataValue === '0') {
+                return;
+            }
+
             var row = $(this).closest('tr');
             var selectedTime = row.find('td').eq(0).text().trim();
             var formattedFirstDay = formatDate($('#datepicker').datepicker('getDate'));
