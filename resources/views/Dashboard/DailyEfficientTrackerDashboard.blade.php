@@ -208,7 +208,7 @@
                     destroy: true,
                     ajax: {
                         type: 'GET',
-                        url: '/dailyEffTrackDashAjax/',
+                        url: '/dailyEffTrackCFDashAjax/',
                         data: {
                             start_date: formattedFirstDay,
                             end_date: formattedLastDay,

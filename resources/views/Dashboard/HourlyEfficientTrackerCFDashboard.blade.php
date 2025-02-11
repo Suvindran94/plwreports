@@ -127,6 +127,10 @@
     #hourlyTotalTable td:nth-child(2) {
         width: 50%;
     }
+
+    .hourly-total {
+        cursor: pointer;
+    }
 </style>
 
 <!-- Content wrapper -->
@@ -250,7 +254,7 @@
                 destroy: true,
                 ajax: {
                     type: 'GET',
-                    url: '/productionDailyReportDashAjax/',
+                    url: '/hourlyEffTrackCFDashAjax/',
                     data: {
                         start_date: formattedFirstDay,
                         end_date: formattedLastDay,
@@ -345,7 +349,7 @@
             var row = $(this).closest('tr');
             var selectedTime = row.find('td').eq(0).text().trim();
             var formattedFirstDay = formatDate($('#datepicker').datepicker('getDate'));
-        var formattedLastDay = formatDate($('#datepicker').datepicker('getDate'));
+            var formattedLastDay = formatDate($('#datepicker').datepicker('getDate'));
 
             $('#hourlyTotalTable colgroup').remove();
 

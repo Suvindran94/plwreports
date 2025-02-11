@@ -65,8 +65,8 @@
 
                 <ul class="menu-inner py-1">
                     <!-- Dashboard -->
-                    <li class="menu-item {{ Request::is('productionDailyReportDash') ? 'active' : '' }}">
-                        <a href="/productionDailyReportDash" class="menu-link">
+                    <li class="menu-item {{ Request::is('hourlyEffTrackCFDash') ? 'active' : '' }}">
+                        <a href="/hourlyEffTrackCFDash" class="menu-link">
                             <i class="menu-icon tf-icons bx bx-tachometer"></i>
                             <div data-i18n="Analytics">Hourly Efficiency Monitor Dashboard (Compression Fittings)</div>
                         </a>
@@ -77,8 +77,8 @@
                             <div data-i18n="Analytics">Hourly Efficiency Monitor Dashboard (PE)</div>
                         </a>
                     </li>
-                    <li class="menu-item {{ Request::is('dailyEffTrackDash') ? 'active' : '' }}">
-                        <a href="/dailyEffTrackDash" class="menu-link">
+                    <li class="menu-item {{ Request::is('dailyEffTrackCFDash') ? 'active' : '' }}">
+                        <a href="/dailyEffTrackCFDash" class="menu-link">
                             <i class="menu-icon tf-icons bx bx-bar-chart-square"></i>
                             <div data-i18n="Analytics">Daily Efficiency Tracker (Compression Fittings)</div>
                         </a>
