@@ -131,6 +131,19 @@
     .hourly-total {
         cursor: pointer;
     }
+
+    #hourlyTotalTable.dataTable th {
+        text-align: left !important;
+    }
+
+    #hourlyTotalTable.dataTable tbody td:nth-child(1),
+    #hourlyTotalTable.dataTable tbody td:nth-child(2) {
+        text-align: left !important;
+    }
+
+    #hourlyTotalTable.dataTable tbody td:nth-child(3) {
+        text-align: center !important;
+    }
 </style>
 
 <!-- Content wrapper -->
@@ -359,8 +372,8 @@
 
             $('#hourlyTotalTable tbody').empty();
 
-            let seenSO = new Set();
-            let previousSO = '';
+            // let seenSO = new Set();
+            // let previousSO = '';
 
             $('#hourlyTotalTable').DataTable({
                 ajax: {
@@ -374,19 +387,25 @@
                     dataSrc: 'data'
                 },
                 columns: [
-                    { data: 'SO#', className: 'text-right' },
-                    { data: 'STOCKCODE', className: 'text-right' },
-                    { data: 'HOURLY TOTAL (ACTUAL)', className: 'text-right' }
-                ],
-                createdRow: function(row, data) {
-                    if (seenSO.has(data['SO#'])) {
-                        $('td:first', row).empty();
-                        $(row).addClass('no-border');
-                    } else {
-                        seenSO.add(data['SO#']);
+                    {
+                        data: 'SO#'
+                    },
+                    {
+                        data: 'STOCKCODE'
+                    },
+                    {
+                        data: 'HOURLY TOTAL (ACTUAL)'
                     }
-                    previousSO = data['SO#'];
-                },
+                ],
+                // createdRow: function(row, data) {
+                //     if (seenSO.has(data['SO#'])) {
+                //         $('td:first', row).empty();
+                //         $(row).addClass('no-border');
+                //     } else {
+                //         seenSO.add(data['SO#']);
+                //     }
+                //     previousSO = data['SO#'];
+                // },
                 paging: false,
                 info: false,
                 searching: false,
