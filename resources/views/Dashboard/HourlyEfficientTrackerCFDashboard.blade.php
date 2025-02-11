@@ -148,6 +148,10 @@
     #hourlyTotalTable.dataTable tbody td:nth-child(3) {
         text-align: center !important;
     }
+
+    #hourlyTotalModal .modal-title {
+        font-size: 1.25vw;
+    }
 </style>
 
 <!-- Content wrapper -->
@@ -374,6 +378,12 @@
 
             var row = $(this).closest('tr');
             var selectedTime = row.find('td').eq(0).text().trim();
+            var selectedDate = $('#datepicker').val();
+
+            var dayOfWeek = moment(selectedDate, "DD/MM/YYYY").format('dddd');
+
+            $('#modalTitle').text(`Hourly Total Details - ${selectedTime} ON ${selectedDate} (${dayOfWeek})`);
+
             var formattedFirstDay = formatDate($('#datepicker').datepicker('getDate'));
             var formattedLastDay = formatDate($('#datepicker').datepicker('getDate'));
 
@@ -384,9 +394,6 @@
             }
 
             $('#hourlyTotalTable tbody').empty();
-
-            // let seenSO = new Set();
-            // let previousSO = '';
 
             $('#hourlyTotalTable').DataTable({
                 ajax: {
@@ -410,15 +417,6 @@
                         data: 'HOURLY TOTAL (ACTUAL)'
                     }
                 ],
-                // createdRow: function(row, data) {
-                //     if (seenSO.has(data['SO#'])) {
-                //         $('td:first', row).empty();
-                //         $(row).addClass('no-border');
-                //     } else {
-                //         seenSO.add(data['SO#']);
-                //     }
-                //     previousSO = data['SO#'];
-                // },
                 paging: false,
                 info: false,
                 searching: false,
