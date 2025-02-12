@@ -1,4 +1,5 @@
 <link rel="stylesheet" href="https://cdn.datatables.net/2.0.0/css/dataTables.dataTables.css" />
+<link href="https://cdn.datatables.net/rowgroup/1.5.0/css/rowGroup.dataTables.min.css" rel="stylesheet">
 @include('Navigation.app')
 <link rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.standalone.min.css">
@@ -104,6 +105,53 @@
         top: 150;
         z-index: 5;
     }
+
+    .btn-close {
+        margin: 0;
+        padding: 0.5rem;
+        transform: none !important;
+        box-shadow: none !important;
+    }
+
+    #hourlyTotalTable.dataTable thead {
+        position: sticky !important;
+        top: 0 !important;
+        z-index: 5;
+    }
+
+    .no-border td {
+        border-top: 1px solid rgb(255 255 255 / 30%) !important;
+    }
+
+    #hourlyTotalTable th:nth-child(2),
+    #hourlyTotalTable td:nth-child(2) {
+        width: 50%;
+    }
+
+    .hourly-total {
+        cursor: pointer;
+    }
+
+    .hourly-total.no-pointer {
+        cursor: auto;
+    }
+
+    #hourlyTotalTable.dataTable th {
+        text-align: left !important;
+    }
+
+    #hourlyTotalTable.dataTable tbody td:nth-child(1),
+    #hourlyTotalTable.dataTable tbody td:nth-child(2) {
+        text-align: left !important;
+    }
+
+    #hourlyTotalTable.dataTable tbody td:nth-child(3) {
+        text-align: center !important;
+    }
+
+    #hourlyTotalModal .modal-title {
+        font-size: 1.25vw;
+    }
 </style>
 
 <!-- Content wrapper -->
@@ -146,12 +194,40 @@
                 </tbody>
             </table>
         </div>
+        <!-- Hourly Total Modal -->
+        <div id="hourlyTotalModal" class="modal fade" tabindex="-1" aria-labelledby="modalTitle" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modalTitle">Hourly Total Details</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <table id="hourlyTotalTable" class="table table-striped table-bordered" style="width:100%;">
+                            <thead>
+                                <tr>
+                                    <th>SO#</th>
+                                    <th>STOCKCODE</th>
+                                    <th>HOURLY TOTAL (ACTUAL)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
 @include('Navigation.footer')
 <script src="https://cdn.datatables.net/2.0.0/js/dataTables.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+<script src="https://cdn.datatables.net/rowgroup/1.5.0/js/dataTables.rowGroup.min.js"></script>
 
 <script>
     function formatDate(date) {
@@ -199,7 +275,7 @@
                 destroy: true,
                 ajax: {
                     type: 'GET',
-                    url: '/productionDailyReportDashAjax/',
+                    url: '/hourlyEffTrackCFDashAjax/',
                     data: {
                         start_date: formattedFirstDay,
                         end_date: formattedLastDay,
@@ -219,7 +295,13 @@
                     },
                     {
                         data: 'HOURLY TOTAL (ACTUAL)',
-                        className: 'text-right'
+                        className: 'text-right',
+                        render: function(data, type, row) {
+                            if (data === 0 || data === '0') {
+                                return `<span class="hourly-total no-pointer" data-id="${row.id}" data-value="${data}">${data}</span>`;
+                            }
+                            return `<span class="hourly-total" data-id="${row.id}" data-value="${data}">${data}</span>`;
+                        }
                     },
                     {
                         data: 'TODAY\'S TOTAL (PACK)',
@@ -286,6 +368,76 @@
                 }
             });
         }
+
+        $(document).on('click', '.hourly-total', function() {
+            var dataValue = $(this).data('value');
+
+            if (dataValue === 0 || dataValue === '0') {
+                return;
+            }
+
+            var row = $(this).closest('tr');
+            var selectedTime = row.find('td').eq(0).text().trim();
+            var selectedDate = $('#datepicker').val();
+
+            var dayOfWeek = moment(selectedDate, "DD/MM/YYYY").format('dddd');
+
+            $('#modalTitle').text(`Hourly Total Details - ${selectedTime} ON ${selectedDate} (${dayOfWeek})`);
+
+            var formattedFirstDay = formatDate($('#datepicker').datepicker('getDate'));
+            var formattedLastDay = formatDate($('#datepicker').datepicker('getDate'));
+
+            $('#hourlyTotalTable colgroup').remove();
+
+            if ($.fn.DataTable.isDataTable('#hourlyTotalTable')) {
+                $('#hourlyTotalTable').DataTable().destroy();
+            }
+
+            $('#hourlyTotalTable tbody').empty();
+
+            $('#hourlyTotalTable').DataTable({
+                ajax: {
+                    type: 'GET',
+                    url: '/gethourlyEfficientCEDetails',
+                    data: {
+                        time: selectedTime,
+                        start_date: formattedFirstDay,
+                        end_date: formattedLastDay,
+                    },
+                    dataSrc: 'data'
+                },
+                columns: [
+                    {
+                        data: 'SO#'
+                    },
+                    {
+                        data: 'STOCKCODE'
+                    },
+                    {
+                        data: 'HOURLY TOTAL (ACTUAL)'
+                    }
+                ],
+                paging: false,
+                info: false,
+                searching: false,
+                lengthChange: false,
+                order: [],
+                columnDefs: [{
+                    orderable: false,
+                    targets: '_all'
+                }]
+            });
+
+            $('#hourlyTotalModal').modal('show');
+        });
+
+        $('#hourlyTotalModal').on('hidden.bs.modal', function () {
+            if ($.fn.DataTable.isDataTable('#hourlyTotalTable')) {
+                $('#hourlyTotalTable').DataTable().destroy();
+            }
+            $('#hourlyTotalTable tbody').empty();
+            $('#hourlyTotalTable colgroup').remove();
+        });
 
         function scrollToHighlightedRow() {
             var highlightedRow = $('.highlight').first();

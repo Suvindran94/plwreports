@@ -702,57 +702,57 @@ where TotalSOQty <> (Done_pbag_PRD + Done_pbag_STK)
     }
 
 
-    public function productDashHourly()
+    // public function productDashHourly()
+    // {
+    //     $currentHour = Carbon::now()->format('H:00:00');
+
+    //     return view('Dashboard.ProductionHourly', compact('currentHour'));
+    // }
+
+    // public function productDashHourlyAjax()
+    // {
+    //     $currentHour = Carbon::now()->format('H:00:00');
+
+    //     $theData = DB::connection('mysql')
+    //         ->select("
+    //         select t_time as 'TIME', target as 'HOURLY TARGET (TARGET)',
+    //             target_accum as 'DAILY TARGET (PACK)', actual as 'HOURLY TOTAL (ACTUAL)', prd_accum as 'TODAY''S TOTAL (PACK)', prd_accum - target_accum as 'ACHIEVEMENT (PACK)'
+    //         from
+    //         (
+    //             select t_time, target, round(@running_target:=@running_target + target ,0) as target_accum, cnt_prd as actual, round(@running_total:=@running_total + cnt_prd ,0) as prd_accum
+    //             from
+    //             (
+    //                 select target, numbers.num as t_time, count(c.dt_opscancomplete) cnt_prd
+    //                 from
+    //                 (
+    //                     select T_HOUR as num, T_HRS_TARGET as target
+    //                     from ierpadmin.TARGET_PRD_HOURLY
+    //                     where T_DAYNAME = DAYNAME(CURDATE())
+
+    //                 ) numbers
+    //                 left join
+    //                 (
+    //                     select  qrmaster.dt_opscancomplete, count(qrcode) from ierpadmin.qrmaster where convert( qrmaster.dt_opscancomplete,date) between CURDATE() and CURDATE()
+    //                     group by  qrmaster.dt_opscancomplete
+    //                 ) c on hour(c.dt_opscancomplete) = hour(numbers.num)
+    //                 group by numbers.num, numbers.target
+    //             ) TempA
+    //             JOIN (SELECT @running_total:=0) r
+    //             JOIN (SELECT @running_target:=0) q
+    //         ) TempZ;
+    //     ");
+
+    //     return response()->json(['data' => $theData, 'currentHour' => $currentHour]);
+    // }
+
+    public function hourlyEfficientTrackCF()
     {
         $currentHour = Carbon::now()->format('H:00:00');
 
-        return view('Dashboard.ProductionHourly', compact('currentHour'));
+        return view('Dashboard.HourlyEfficientTrackerCFDashboard', compact('currentHour'));
     }
 
-    public function productDashHourlyAjax()
-    {
-        $currentHour = Carbon::now()->format('H:00:00');
-
-        $theData = DB::connection('mysql')
-            ->select("
-            select t_time as 'TIME', target as 'HOURLY TARGET (TARGET)',
-                target_accum as 'DAILY TARGET (PACK)', actual as 'HOURLY TOTAL (ACTUAL)', prd_accum as 'TODAY''S TOTAL (PACK)', prd_accum - target_accum as 'ACHIEVEMENT (PACK)'
-            from
-            (
-                select t_time, target, round(@running_target:=@running_target + target ,0) as target_accum, cnt_prd as actual, round(@running_total:=@running_total + cnt_prd ,0) as prd_accum
-                from
-                (
-                    select target, numbers.num as t_time, count(c.dt_opscancomplete) cnt_prd
-                    from
-                    (
-                        select T_HOUR as num, T_HRS_TARGET as target
-                        from ierpadmin.TARGET_PRD_HOURLY
-                        where T_DAYNAME = DAYNAME(CURDATE())
-
-                    ) numbers
-                    left join
-                    (
-                        select  qrmaster.dt_opscancomplete, count(qrcode) from ierpadmin.qrmaster where convert( qrmaster.dt_opscancomplete,date) between CURDATE() and CURDATE()
-                        group by  qrmaster.dt_opscancomplete
-                    ) c on hour(c.dt_opscancomplete) = hour(numbers.num)
-                    group by numbers.num, numbers.target
-                ) TempA
-                JOIN (SELECT @running_total:=0) r
-                JOIN (SELECT @running_target:=0) q
-            ) TempZ;
-        ");
-
-        return response()->json(['data' => $theData, 'currentHour' => $currentHour]);
-    }
-
-    public function productDashDailyReport()
-    {
-        $currentHour = Carbon::now()->format('H:00:00');
-
-        return view('Dashboard.ProductionDaily', compact('currentHour'));
-    }
-
-    public function productDashDailyReportAjax(Request $request)
+    public function hourlyEfficientTrackCFAjax(Request $request)
     {
         $startDate = $request->start_date;
         $endDate = $request->end_date;
@@ -779,6 +779,7 @@ where TotalSOQty <> (Done_pbag_PRD + Done_pbag_STK)
                     left join
                     (
                     select  qrmaster.dt_opscancomplete, count(qrcode) from ierpadmin.qrmaster where convert( qrmaster.dt_opscancomplete,date) between '" . $startDate . "' and '" . $endDate . "'
+                    and stockcode like '1%'
                     group by  qrmaster.dt_opscancomplete
                     ) c on hour(c.dt_opscancomplete) = hour(numbers.num)
                     group by numbers.num, numbers.target
@@ -791,14 +792,14 @@ where TotalSOQty <> (Done_pbag_PRD + Done_pbag_STK)
         return response()->json(['data' => $theData, 'currentHour' => $currentHour]);
     }
 
-    public function dailyEfficientTrack()
+    public function dailyEfficientTrackCF()
     {
         $currentHour = Carbon::now()->format('H:00:00');
 
         return view('Dashboard.DailyEfficientTrackerDashboard', compact('currentHour'));
     }
 
-    public function dailyEfficientTrackAjax(Request $request)
+    public function dailyEfficientTrackCFAjax(Request $request)
     {
         $startDate = $request->start_date;
         $endDate = $request->end_date;
@@ -1032,6 +1033,45 @@ where TotalSOQty <> (Done_pbag_PRD + Done_pbag_STK)
                     JOIN (SELECT @running_waste:=0) p
                 ) TempZ;
             ");
+
+        return response()->json(['data' => $theData, 'currentHour' => $currentHour]);
+    }
+
+    public function hourlyEfficientCEDetails(Request $request)
+    {
+        $time = $request->query('time', '20:00:00');
+
+        $startDate = $request->start_date;
+        $endDate = $request->end_date;
+
+        $currentHour = Carbon::now()->format('H:00:00');
+
+        $theData = DB::connection('mysql')
+        ->select("
+            select '2025-02-07' as 'DATE', t_time as 'TIME', sonum as 'SO#',
+                stockcode as 'STOCKCODE', cnt_prd as 'HOURLY TOTAL (ACTUAL)'
+            from
+            (
+                select target, numbers.num as t_time, sonum, stockcode, count(c.dt_opscancomplete) cnt_prd
+                from
+                    (
+                        select T_HOUR as num, T_HRS_TARGET as target
+                        from ierpadmin.TARGET_PRD_HOURLY
+                        where T_DAYNAME = DAYNAME(STR_TO_DATE('" . $endDate . "', '%Y-%m-%d'))
+                    ) numbers
+                    left join
+                    (
+                        select sonum, stockcode, qrmaster.dt_opscancomplete, count(qrcode)
+                        from ierpadmin.qrmaster
+                        where convert( qrmaster.dt_opscancomplete,date) between '" . $startDate . "' and '" . $endDate . "'
+                        and stockcode like '1%'
+                        group by sonum, stockcode, qrmaster.dt_opscancomplete
+                    ) c on hour(c.dt_opscancomplete) = hour(numbers.num)
+                group by sonum, stockcode, numbers.num, numbers.target
+            ) TempA
+            where t_time = ?
+            order by 1,2,3,4
+        ", [$time]);
 
         return response()->json(['data' => $theData, 'currentHour' => $currentHour]);
     }
