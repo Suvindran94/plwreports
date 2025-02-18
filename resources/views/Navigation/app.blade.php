@@ -80,7 +80,7 @@
                     <li class="menu-item {{ Request::is('dailyEffTrackCFDash') ? 'active' : '' }}">
                         <a href="/dailyEffTrackCFDash" class="menu-link">
                             <i class="menu-icon tf-icons bx bx-bar-chart-square"></i>
-                            <div data-i18n="Analytics">Daily Efficiency Tracker (Compression Fittings)</div>
+                            <div data-i18n="Analytics">Daily Efficiency Tracker</div>
                         </a>
                     </li>
                     <li class="menu-item {{ Request::is('/') ? 'active' : '' }}">
