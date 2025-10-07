@@ -47,6 +47,16 @@
         line-height: 1 !important;
     }
 
+    .chart-card {
+        margin: 0 20px 20px 20px;
+    }
+
+    .chart-container {
+        position: relative;
+        height: 45vh;
+        min-height: 320px;
+    }
+
     table.dataTable thead {
         background-color: #d3d3d3;
     }
@@ -179,6 +189,14 @@
             </div>
         </div>
         <div>
+            <div class="card chart-card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Hourly Performance Overview</h5>
+                    <div class="chart-container">
+                        <canvas id="hourlyEfficientChart"></canvas>
+                    </div>
+                </div>
+            </div>
             <table id="datatable" class="table table-striped table-bordered" style="width:100%;">
                 <thead>
                     <tr>
@@ -228,8 +246,11 @@
 <script src="https://cdn.datatables.net/2.0.0/js/dataTables.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
 <script src="https://cdn.datatables.net/rowgroup/1.5.0/js/dataTables.rowGroup.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 
 <script>
+    let hourlyChart = null;
+
     function formatDate(date) {
         var year = date.getFullYear();
         var month = (date.getMonth() + 1).toString().padStart(2, '0');
@@ -256,6 +277,182 @@
         return formattedHour;
     }
 
+    function formatTimeLabel(timeString) {
+        if (!timeString) {
+            return '';
+        }
+
+        var parts = timeString.split(':');
+        var hourPart = parseInt(parts[0], 10);
+
+        if (isNaN(hourPart)) {
+            return timeString;
+        }
+
+        var suffix = hourPart >= 12 ? 'pm' : 'am';
+        var displayHour = hourPart % 12;
+        if (displayHour === 0) {
+            displayHour = 12;
+        }
+
+        return displayHour + suffix;
+    }
+
+    function parseNumericValue(value) {
+        if (value === null || value === undefined) {
+            return 0;
+        }
+
+        if (typeof value === 'number') {
+            return value;
+        }
+
+        var normalized = String(value).replace(/,/g, '').trim();
+        var parsed = parseFloat(normalized);
+        return isNaN(parsed) ? 0 : parsed;
+    }
+
+    function buildChartData(rows) {
+        var labels = [];
+        var hourlyTarget = [];
+        var hourlyActual = [];
+        var arlValues = [];
+        var cumulativeActual = 0;
+
+        rows.forEach(function(row, index) {
+            var timeLabel = row['TIME'] || '';
+            var targetValue = parseNumericValue(row['HOURLY TARGET (TARGET)']);
+            var actualValue = parseNumericValue(row['HOURLY TOTAL (ACTUAL)']);
+
+            labels.push(formatTimeLabel(timeLabel));
+            hourlyTarget.push(targetValue);
+            hourlyActual.push(actualValue);
+
+            cumulativeActual += actualValue;
+            var divisor = index + 1;
+            var arl = divisor > 0 ? cumulativeActual / divisor : 0;
+
+            arlValues.push(Math.ceil(arl));
+        });
+
+        return {
+            labels: labels,
+            target: hourlyTarget,
+            actual: hourlyActual,
+            arl: arlValues
+        };
+    }
+
+    function renderHourlyChart(rows) {
+        var canvas = document.getElementById('hourlyEfficientChart');
+
+        if (!canvas) {
+            return;
+        }
+
+        if (!rows || !rows.length) {
+            if (hourlyChart) {
+                hourlyChart.destroy();
+                hourlyChart = null;
+            }
+            return;
+        }
+
+        var chartData = buildChartData(rows);
+        var allValues = chartData.target.concat(chartData.actual, chartData.arl).filter(function(value) {
+            return !isNaN(value);
+        });
+
+        var maxValue = allValues.length ? Math.max.apply(Math, allValues) : 0;
+        var suggestedMax = Math.ceil((maxValue || 5) / 5) * 5;
+
+        if (hourlyChart) {
+            hourlyChart.destroy();
+        }
+
+        hourlyChart = new Chart(canvas.getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: chartData.labels,
+                datasets: [{
+                        label: 'Hourly Target',
+                        data: chartData.target,
+                        borderColor: '#0d6efd',
+                        backgroundColor: 'rgba(13, 110, 253, 0.1)',
+                        borderWidth: 2,
+                        tension: 0.3,
+                        pointRadius: 3,
+                        pointHoverRadius: 5,
+                        fill: false
+                    },
+                    {
+                        label: 'Hourly Total (Actual)',
+                        data: chartData.actual,
+                        borderColor: '#e67e22',
+                        backgroundColor: 'rgba(230, 126, 34, 0.15)',
+                        borderWidth: 2,
+                        tension: 0.3,
+                        pointRadius: 3,
+                        pointHoverRadius: 5,
+                        fill: false
+                    },
+                    {
+                        label: 'ARL',
+                        data: chartData.arl,
+                        borderColor: '#20c997',
+                        backgroundColor: 'rgba(32, 201, 151, 0.1)',
+                        borderWidth: 2,
+                        borderDash: [6, 6],
+                        tension: 0.2,
+                        pointRadius: 0,
+                        pointHoverRadius: 4,
+                        fill: false
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    mode: 'index',
+                    intersect: false
+                },
+                plugins: {
+                    legend: {
+                        position: 'top'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                var label = context.dataset.label || '';
+                                var value = context.parsed.y;
+                                return label + ': ' + Number(value).toLocaleString();
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        ticks: {
+                            maxRotation: 70,
+                            minRotation: 45
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        suggestedMax: suggestedMax < 5 ? 5 : suggestedMax,
+                        ticks: {
+                            stepSize: 5,
+                            callback: function(value) {
+                                return Number(value).toLocaleString();
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
     $(document).ready(function() {
         function initializeDataTable(date) {
             var formattedDate = formatDate2(date);
@@ -269,7 +466,7 @@
 
             $('#date-heading').text(`HOURLY EFFICIENCY MONITOR (COMPRESSION FITTINGS) ON ${formattedDate} (${formattedDay})`);
 
-            $('#datatable').DataTable({
+            var table = $('#datatable').DataTable({
                 // scrollCollapse: true,
                 // scrollY: 600,
                 destroy: true,
@@ -366,6 +563,11 @@
                 drawCallback: function(settings) {
                     scrollToHighlightedRow();
                 }
+            });
+
+            table.on('xhr.dt', function(e, settings, json) {
+                var rows = json && json.data ? json.data : [];
+                renderHourlyChart(rows);
             });
         }
 
