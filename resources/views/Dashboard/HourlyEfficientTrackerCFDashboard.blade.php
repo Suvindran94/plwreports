@@ -332,7 +332,8 @@
             var divisor = index + 1;
             var arl = divisor > 0 ? cumulativeActual / divisor : 0;
 
-            arlValues.push(Math.ceil(arl));
+          arlValues.push(Math.round(arl));
+
         });
 
         return {
